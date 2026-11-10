@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment: { POSTGRES_DB: cafe, POSTGRES_USER: cafe, POSTGRES_PASSWORD: cafe_pass_change_me }
+    volumes: [pgdata:/var/lib/postgresql/data]
+    ports: ["5432:5432"]
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql://cafe:cafe_pass_change_me@db:5432/cafe
+      BOT_TOKEN: ${BOT_TOKEN:-}
+      GROUP_CHAT_ID: ${GROUP_CHAT_ID:-}
+      WEBAPP_URL: ${WEBAPP_URL:-http://localhost:5173}
+      JWT_SECRET: ${JWT_SECRET:-change-me}
+      DEV_AUTH: "1"
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID:-}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET:-}
+    ports: ["8000:8000"]
+    depends_on: [db]
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    volumes: [./frontend:/app]
+    command: sh -c "npm install && npm run dev -- --host --port 5173"
+    environment: { VITE_API_URL: http://localhost:8000 }
+    ports: ["5173:5173"]
+volumes: { pgdata: {} }

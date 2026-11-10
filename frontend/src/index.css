@@ -1,0 +1,13 @@
+@tailwind base; @tailwind components; @tailwind utilities;
+body{ background:#FFF8F0; color:#201009; font-family: system-ui,-apple-system,Segoe UI,Roboto,sans-serif; -webkit-tap-highlight-color:transparent; }
+.glass{ background:rgba(255,255,255,.72); backdrop-filter:blur(14px); border:1px solid rgba(255,255,255,.6); }
+.card-shadow{ box-shadow:0 18px 35px -12px rgba(59,35,20,.35), 0 4px 10px rgba(59,35,20,.12); }
+@keyframes floaty { 0%,100%{ transform:translateY(0) rotate(-1deg)} 50%{ transform:translateY(-10px) rotate(1deg)} }
+.floaty{ animation:floaty 4.5s ease-in-out infinite; }
+@keyframes spinSlow { from{transform:rotateY(0deg)} to{transform:rotateY(360deg)} }
+.dish3d{ transform-style:preserve-3d; animation:spinSlow 14s linear infinite; }
+.tilt{ transition:transform .25s ease; transform:perspective(800px) rotateX(0) rotateY(0); }
+.tilt:active{ transform:perspective(800px) rotateX(4deg) rotateY(-4deg) scale(.98); }
+.no-scrollbar::-webkit-scrollbar{display:none} .no-scrollbar{scrollbar-width:none}
+.skeleton{ background:linear-gradient(90deg,#f3e7d8 25%,#fff4e3 50%,#f3e7d8 75%); background-size:200% 100%; animation:sk 1.2s infinite; }
+@keyframes sk{ to{background-position:-200% 0} }
