@@ -1,23 +1,26 @@
 """Telegram bot — run: python -m app.bot  (needs BOT_TOKEN, WEBAPP_URL)
 
-Note: this process reads BOT_TOKEN / WEBAPP_URL from the terminal session
-environment (os.getenv) — it does NOT load backend/.env. The staff-group
-order buttons work through callback queries, which arrive with the group
-message attached, so the bot does not need GROUP_CHAT_ID; only the API
-process needs it (in backend/.env) to post the original group message.
+Note: this process reads BOT_TOKEN / WEBAPP_URL through app.config
+(pydantic-settings), so backend/.env is loaded — the same file the API
+process uses. A value set in the terminal session still wins over .env.
+The staff-group order buttons work through callback queries, which arrive
+with the group message attached, so the bot does not need GROUP_CHAT_ID;
+only the API process needs it (in backend/.env) to post the original
+group message.
 Status changes made here are written to the SAME database the API uses
 (shared app.database / app.models), so the Mini App tracker and the admin
 dashboard see them immediately.
 """
-import asyncio, logging, os
+import asyncio, logging
+from .config import settings
 logging.basicConfig(level=logging.INFO)
 try:
     from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
     from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
 except ImportError:
     Update=None
-BOT_TOKEN=os.getenv("BOT_TOKEN","")
-WEBAPP_URL=os.getenv("WEBAPP_URL","http://localhost:5173")
+BOT_TOKEN=settings.BOT_TOKEN
+WEBAPP_URL=settings.WEBAPP_URL
 CAFE="Brew & Bite Cafe"
 def kb():
     return InlineKeyboardMarkup([[InlineKeyboardButton("Order Food 🍔", web_app=WebAppInfo(url=WEBAPP_URL))],[InlineKeyboardButton("Explore Our Menu 📖", web_app=WebAppInfo(url=WEBAPP_URL))]])
@@ -127,7 +130,7 @@ async def order_status_callback(update, ctx):
 
 def main():
     if not BOT_TOKEN:
-        print("BOT_TOKEN not set — bot cannot start. Set it in the terminal env or .env (get it from @BotFather)."); return
+        print("BOT_TOKEN not set — bot cannot start. Put it in backend/.env (get it from @BotFather) and run the bot from the backend folder."); return
     app=Application.builder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start)); app.add_handler(CommandHandler("menu", menu)); app.add_handler(CommandHandler("orders", orders)); app.add_handler(CommandHandler("track", track)); app.add_handler(CommandHandler("help", help_cmd)); app.add_handler(CommandHandler("chatid", chatid))
     app.add_handler(CallbackQueryHandler(order_status_callback, pattern=r"^ord:"))

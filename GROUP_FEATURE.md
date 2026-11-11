@@ -20,7 +20,7 @@ When a customer places an order in the Mini App, the backend posts a message to 
 | Bot callbacks (`ord:<code>:<status>`), `/chatid` setup helper, customer DMs | `backend/app/bot.py` |
 | `GROUP_CHAT_ID` setting + `orders.group_message_id` column (+ startup auto-add for older local DBs) | `backend/app/config.py`, `backend/app/models.py`, `backend/app/main.py` |
 
-Config notes: the **API process** reads `GROUP_CHAT_ID` from `backend/.env` (pydantic settings). The **bot process** still reads `BOT_TOKEN`/`WEBAPP_URL` from its terminal session env (unchanged behaviour — it never loads `.env`) and does **not** need `GROUP_CHAT_ID`: button taps arrive as callback queries with the group message attached.
+Config notes: the **API process** reads `GROUP_CHAT_ID` from `backend/.env` (pydantic settings). The **bot process** now reads `BOT_TOKEN`/`WEBAPP_URL` from the same `backend/.env` (via `app.config`) — no per-terminal `$env:` line needed; a terminal value still wins if set. It does **not** need `GROUP_CHAT_ID`: button taps arrive as callback queries with the group message attached.
 
 ## Setup (also in README)
 1. Create a staff Telegram group, add **@Digital_Cafebot**.

@@ -84,7 +84,7 @@ Every new order is posted to your cafe's staff Telegram group with the full orde
 4. Restart the **backend** (the API reads `GROUP_CHAT_ID` from `backend/.env`) and restart the **bot** too.
 5. Place a test order from the Mini App — the notification with buttons should appear in the group. Tap **Accepted** and watch the message, the customer tracker and the admin dashboard all update.
 
-Notes: notifications are best-effort — if Telegram is unreachable or `GROUP_CHAT_ID` is empty, orders still place normally. The bot process reads `BOT_TOKEN`/`WEBAPP_URL` from its terminal session environment (it does not load `.env`); it does **not** need `GROUP_CHAT_ID` — button taps arrive as callback queries with the group message attached, and the bot writes the new status to the same database the API uses.
+Notes: notifications are best-effort — if Telegram is unreachable or `GROUP_CHAT_ID` is empty, orders still place normally. The bot process reads `BOT_TOKEN`/`WEBAPP_URL` from `backend/.env` (via `app.config`, same as the API); a value set in the terminal session still wins over `.env`. It does **not** need `GROUP_CHAT_ID` — button taps arrive as callback queries with the group message attached, and the bot writes the new status to the same database the API uses.
 
 ## Admin Dashboard (`/admin`)
 Login (JWT + role) → overview stats (total/today orders, revenue, pending, completed, popular items, recent transactions) • food CRUD + availability toggle • category CRUD • order management with status changes + printable receipt • coupons • tables • inventory with low-stock flags • sales report by day • settings (cafe info, hours, GST % — GST feeds the server-side price calculation).
