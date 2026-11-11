@@ -84,6 +84,8 @@ Every new order is posted to your cafe's staff Telegram group with the full orde
 4. Restart the **backend** (the API reads `GROUP_CHAT_ID` from `backend/.env`) and restart the **bot** too.
 5. Place a test order from the Mini App — the notification with buttons should appear in the group. Tap **Accepted** and watch the message, the customer tracker and the admin dashboard all update.
 
+**Troubleshooting — orders show in the admin panel but nothing arrives in the group:** check the backend's startup log. On every boot it prints one line: `notify config: BOT_TOKEN set=YES, GROUP_CHAT_ID set=YES` (booleans only — no secret values). That line must show `GROUP_CHAT_ID set=YES`. If it shows `NO`, the value is missing at runtime: either it was put in the **project-root** `.env` instead of **`backend/.env`** (the file in the same folder as the backend code — that is the one the API reads), or the backend was not **fully restarted** after editing `.env` (saving the file alone does not reload it; stop uvicorn completely and start it again). Fix the file/restart, confirm the startup line flips to `YES`, then place a new test order — older orders are not re-sent.
+
 Notes: notifications are best-effort — if Telegram is unreachable or `GROUP_CHAT_ID` is empty, orders still place normally. The bot process reads `BOT_TOKEN`/`WEBAPP_URL` from `backend/.env` (via `app.config`, same as the API); a value set in the terminal session still wins over `.env`. It does **not** need `GROUP_CHAT_ID` — button taps arrive as callback queries with the group message attached, and the bot writes the new status to the same database the API uses.
 
 ## Admin Dashboard (`/admin`)

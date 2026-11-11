@@ -39,6 +39,13 @@ def _ensure_columns():
 def startup():
     Base.metadata.create_all(bind=engine)
     _ensure_columns()
+    # Config visibility for the staff-group notification feature — booleans
+    # only, never the token value or the chat-id digits.
+    logging.info(
+        "notify config: BOT_TOKEN set=%s, GROUP_CHAT_ID set=%s",
+        "YES" if settings.BOT_TOKEN else "NO",
+        "YES" if (settings.GROUP_CHAT_ID or "").strip() else "NO",
+    )
     try: seed()
     except Exception as e: logging.warning(f"seed: {e}")
 @app.get("/health")
