@@ -2,7 +2,18 @@
 // (e.g. static preview), falls back to bundled seed data mirroring the backend seed
 // so every screen stays fully clickable; orders then simulate locally.
 import { FOODS, CATEGORIES, COUPONS, TABLES, calcDiscount, Food } from './seedData'
-export const API_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8000'
+// API base URL resolution:
+// - An explicit VITE_API_URL always wins (preview/production builds).
+// - Opened from the dev machine itself (localhost/127.0.0.1 in the browser),
+//   talk straight to the backend on :8000.
+// - Otherwise (e.g. opened on a phone through the ngrok tunnel for the Vite
+//   dev server) use same-origin relative URLs: the Vite dev server proxies
+//   /api to the backend (see vite.config.ts). Never hard-code localhost here —
+//   on a phone, localhost is the phone itself, so every call would fail and
+//   orders would silently fall back to local simulation.
+const _viteApiUrl = (import.meta as any).env?.VITE_API_URL
+const _host = typeof window !== 'undefined' ? window.location.hostname : ''
+export const API_URL = _viteApiUrl ? _viteApiUrl : (_host === 'localhost' || _host === '127.0.0.1' ? 'http://localhost:8000' : '')
 declare global { interface Window { Telegram?: any } }
 export const tg = () => window.Telegram?.WebApp
 export function initTelegram(){
